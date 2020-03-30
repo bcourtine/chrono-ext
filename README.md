@@ -25,10 +25,25 @@ Week is defined by:
 - The first day-of-week (Monday, Tuesday, …).
 - The minimal number of days in the first week.
 
+Example:
+
+```rust
+use chrono::NaiveDate;
+use chrono_ext::{WeekSpecification, CustomWeek};
+
+fn use_french_theater_week() {
+    let french_theater_week: WeekSpecification = WeekSpecification::french_theater_week();
+    let date = NaiveDate::from_ymd(2017, 1, 3);
+
+    let week = french_theater_week.week(date);
+    println!("{}", week.format("%Y - W%W")); // 2016 - W53
+}
+```
+
 ## Installation
 
 Add the following to `Cargo.toml` under `[dependencies]`:
 
-```
-chrno_ext = "0.1.0"
+```toml
+chrono_ext = "0.1.0"
 ```
