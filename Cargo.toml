@@ -4,6 +4,18 @@ version = "0.1.0"
 authors = ["Benoît Courtine <benoit.courtine@gmail.com>"]
 edition = "2018"
 
+description = "Unofficial extensions for chrono crate (custom week definitions)"
+homepage = "https://github.com/bcourtine/chrono-ext"
+documentation = "https://docs.rs/chrono_ext/"
+repository = "https://github.com/bcourtine/chrono-ext"
+keywords = ["date", "time", "calendar"]
+categories = ["date-and-time"]
+readme = "README.md"
+license = "MIT"
+
+[lib]
+name = "chrono_ext"
+
 [dependencies]
 chrono = "^0.4"
 failure = "^0.1"
