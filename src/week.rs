@@ -150,7 +150,7 @@ impl WeekSpecification {
     /// let french_theater_first_dow_2016_53 = NaiveDate::from_ymd(2016, 12, 28);
     /// let french_theater_last_dow_2016_53 = NaiveDate::from_ymd(2017, 1, 3);
     ///
-    /// let week = french_theater_week.week(french_theater_last_dow_2016_53);
+    /// let week = french_theater_week.week_from_date(french_theater_last_dow_2016_53);
     ///
     /// assert_eq!(2016, week.year());
     /// assert_eq!(53, week.week());
@@ -158,7 +158,7 @@ impl WeekSpecification {
     /// assert_eq!(french_theater_first_dow_2016_53, week.week_start());
     /// assert_eq!(french_theater_week, week.specification());
     /// ~~~~
-    pub fn week(&self, date: NaiveDate) -> CustomWeek {
+    pub fn week_from_date(&self, date: NaiveDate) -> CustomWeek {
         let date_year = date.year();
         let first = self.first_day_of_week_based_year(date_year);
         let last = self.last_day_of_week_based_year(date_year);
@@ -181,6 +181,41 @@ impl WeekSpecification {
             week,
             week_start,
             specification: self.clone(),
+        }
+    }
+
+    /// Compute week for a given year/week number, according current specification.
+    ///
+    /// ~~~~
+    /// use chrono::NaiveDate;
+    /// use chrono_ext::{WeekSpecification, CustomWeek};
+    ///
+    /// let french_theater_week: WeekSpecification = WeekSpecification::french_theater_week();
+    ///
+    /// let french_theater_first_dow_2016_53 = NaiveDate::from_ymd(2016, 12, 28);
+    ///
+    /// let week = french_theater_week.week_from_yw(2016, 53).unwrap();
+    ///
+    /// assert_eq!(2016, week.year());
+    /// assert_eq!(53, week.week());
+    /// assert_eq!(52, week.week0());
+    /// assert_eq!(french_theater_first_dow_2016_53, week.week_start());
+    /// assert_eq!(french_theater_week, week.specification());
+    /// ~~~~
+    pub fn week_from_yw(&self, year: i32, week: u32) -> Result<CustomWeek, Error> {
+
+        let num_weeks = self.num_weeks(year);
+        if week < 1 || week > num_weeks {
+            Err(Error::OutOfRange(week, 0, num_weeks))
+        } else {
+            let year_start_date = self.first_day_of_week_based_year(year);
+            let week_start = year_start_date + Duration::weeks(week as i64 - 1);
+            Ok(CustomWeek {
+                year,
+                week,
+                week_start,
+                specification: self.clone(),
+            })
         }
     }
 }
@@ -223,12 +258,12 @@ impl CustomWeek {
 
     /// The next week according to the same specification.
     pub fn succ(&self) -> CustomWeek {
-        self.specification.week(self.week_start + Duration::weeks(1))
+        self.specification.week_from_date(self.week_start + Duration::weeks(1))
     }
 
     /// The previous week according to the same specification.
     pub fn pred(&self) -> CustomWeek {
-        self.specification.week(self.week_start - Duration::weeks(1))
+        self.specification.week_from_date(self.week_start - Duration::weeks(1))
     }
 
     /// Verify if the given date is in the current week.
@@ -256,7 +291,7 @@ impl CustomWeek {
     /// let french_theater_week: WeekSpecification = WeekSpecification::french_theater_week();
     ///
     /// let french_theater_dow_2016_53 = NaiveDate::from_ymd(2017, 1, 3);
-    /// let week = french_theater_week.week(french_theater_dow_2016_53);
+    /// let week = french_theater_week.week_from_date(french_theater_dow_2016_53);
     ///
     /// assert_eq!("Year 2016", week.format("Year %Y"));
     /// assert_eq!("Year 2016", week.format("Year %C%y"));
@@ -292,7 +327,7 @@ mod tests {
         assert_eq!(Weekday::Sat, date.weekday());
 
         let sunday_start_spec = WeekSpecification::sunday_start();
-        let week = sunday_start_spec.week(date);
+        let week = sunday_start_spec.week_from_date(date);
 
         assert_eq!(2011, week.year());
         assert_eq!(1, week.week());
