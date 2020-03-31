@@ -206,7 +206,7 @@ impl WeekSpecification {
 
         let num_weeks = self.num_weeks(year);
         if week < 1 || week > num_weeks {
-            Err(Error::OutOfRange(week, 0, num_weeks))
+            Err(Error::OutOfRange(week, 1, num_weeks))
         } else {
             let year_start_date = self.first_day_of_week_based_year(year);
             let week_start = year_start_date + Duration::weeks(week as i64 - 1);
@@ -332,5 +332,16 @@ mod tests {
         assert_eq!(2011, week.year());
         assert_eq!(1, week.week());
         assert_eq!(NaiveDate::from_ymd(2010, 12, 26), week.week_start());
+    }
+
+    #[test]
+    pub fn out_of_range_error_should_have_correct_message() {
+
+        let french_theater_week: WeekSpecification = WeekSpecification::french_theater_week();
+        let week = french_theater_week.week_from_yw(2016, 54);
+
+        assert!(week.is_err());
+        let error_msg = format!("{}", week.err().unwrap());
+        assert_eq!("54 value is out of range (min: 1 - max: 53)", error_msg);
     }
 }
