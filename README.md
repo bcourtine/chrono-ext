@@ -45,5 +45,5 @@ fn use_french_theater_week() {
 Add the following to `Cargo.toml` under `[dependencies]`:
 
 ```toml
-chrono_ext = "0.1.0"
+chrono_ext = "0.1.1"
 ```
