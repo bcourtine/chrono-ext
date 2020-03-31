@@ -277,3 +277,25 @@ impl CustomWeek {
             .replace("%W", &week)
     }
 }
+
+// Verify that weeks are calculated correctly in corner cases (near year start/end).
+#[cfg(test)]
+mod tests {
+
+    pub use super::*;
+
+    // In "Sunday start" spec, the first week is in year y when only 1 weekday is in year y.
+    #[test]
+    pub fn sunday_start_week_should_be_correct_with_only_one_day_in_week_year() {
+
+        let date = NaiveDate::from_ymd(2011, 1, 1);
+        assert_eq!(Weekday::Sat, date.weekday());
+
+        let sunday_start_spec = WeekSpecification::sunday_start();
+        let week = sunday_start_spec.week(date);
+
+        assert_eq!(2011, week.year());
+        assert_eq!(1, week.week());
+        assert_eq!(NaiveDate::from_ymd(2010, 12, 26), week.week_start());
+    }
+}
